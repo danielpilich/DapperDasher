@@ -18,6 +18,10 @@ int main()
     int rectangleY{windowHeight - rectangleHeight};
     int rectangleVelocity{0};
 
+    bool isInAir{false};
+
+    const int jumpVelocity{22};
+
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
@@ -27,21 +31,24 @@ int main()
 
         DrawRectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight, BLUE);
 
-
         if (rectangleY >= windowHeight - rectangleHeight)
         {
             // Rectangle on the ground
+            isInAir = false;
+
             rectangleVelocity = 0;
         }
-        else{
-            // Rectangle in the air            
+        else
+        {
+            // Rectangle in the air
+            isInAir = true;
+
             rectangleVelocity += gravity;
         }
 
-        
-        if (IsKeyPressed(KEY_SPACE))
+        if (IsKeyPressed(KEY_SPACE) && !isInAir)
         {
-            rectangleVelocity -= 10;
+            rectangleVelocity -= jumpVelocity;
         }
 
         rectangleY += rectangleVelocity;
