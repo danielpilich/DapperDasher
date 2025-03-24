@@ -19,10 +19,13 @@ int main()
     Vector2 heroPosition;
     heroPosition.x = windowWidth/2 - heroRectangle.width/2;
     heroPosition.y = windowHeight - heroRectangle.height;
+    int heroAnimationFrame{0};
 
     int velocity{0};
     bool isInAir{false};
-
+    float runningTime{0};
+    
+    const float updateTime{1.0f / 12.0f};
     const int jumpVelocity{1'000}; // pixels / second
 
     SetTargetFPS(60);
@@ -33,6 +36,20 @@ int main()
         ClearBackground(WHITE);
 
         const float deltaTime{ GetFrameTime() };
+
+        runningTime += deltaTime;
+
+        // Update animation frame
+        if(runningTime >= updateTime){
+            runningTime = 0;
+
+            heroRectangle.x = heroAnimationFrame * heroRectangle.width;
+            heroAnimationFrame++;
+            if(heroAnimationFrame > 5){
+                heroAnimationFrame = 0;
+            }
+        }
+        
 
         DrawTextureRec(hero, heroRectangle, heroPosition, WHITE );
 
