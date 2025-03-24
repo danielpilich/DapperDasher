@@ -10,14 +10,17 @@ int main()
 
     const int gravity{1};
 
-    // Rectangle dimensions and properties
-    const int rectangleWidth{50};
-    const int rectangleHeight{80};
+    Texture2D hero = LoadTexture("textures/hero.png");
+    Rectangle heroRectangle;
+    heroRectangle.width = hero.width/6;
+    heroRectangle.height = hero.height;
+    heroRectangle.x = 0;
+    heroRectangle.y = 0;
+    Vector2 heroPosition;
+    heroPosition.x = windowWidth/2 - heroRectangle.width/2;
+    heroPosition.y = windowHeight - heroRectangle.height;
 
-    int rectangleX{windowWidth / 2 - rectangleWidth};
-    int rectangleY{windowHeight - rectangleHeight};
-    int rectangleVelocity{0};
-
+    int velocity{0};
     bool isInAir{false};
 
     const int jumpVelocity{22};
@@ -29,31 +32,32 @@ int main()
         BeginDrawing();
         ClearBackground(WHITE);
 
-        DrawRectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight, BLUE);
+        DrawTextureRec(hero, heroRectangle, heroPosition, WHITE );
 
-        if (rectangleY >= windowHeight - rectangleHeight)
+        if (heroPosition.y >= windowHeight - heroRectangle.height)
         {
             // Rectangle on the ground
             isInAir = false;
 
-            rectangleVelocity = 0;
+            velocity = 0;
         }
         else
         {
             // Rectangle in the air
             isInAir = true;
 
-            rectangleVelocity += gravity;
+            velocity += gravity;
         }
 
         if (IsKeyPressed(KEY_SPACE) && !isInAir)
         {
-            rectangleVelocity -= jumpVelocity;
+            velocity -= jumpVelocity;
         }
 
-        rectangleY += rectangleVelocity;
+        heroPosition.y += velocity;
 
         EndDrawing();
     }
+    UnloadTexture(hero);
     CloseWindow();
 }
