@@ -10,6 +10,11 @@ int main()
 
     const int gravity{2'000}; // (pixels / second) / second
 
+    Texture2D obstacle = LoadTexture("textures/obstacle.png");
+    Rectangle obstacleRectangle{0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8};
+    Vector2 obstaclePosition{windowWidth, windowHeight - obstacleRectangle.height};
+    int obstacleVelocity{-600};
+
     Texture2D hero = LoadTexture("textures/hero.png");
     Rectangle heroRectangle;
     heroRectangle.width = hero.width/6;
@@ -20,8 +25,8 @@ int main()
     heroPosition.x = windowWidth/2 - heroRectangle.width/2;
     heroPosition.y = windowHeight - heroRectangle.height;
     int heroAnimationFrame{0};
+    int heroVelocity{0};
 
-    int velocity{0};
     bool isInAir{false};
     float runningTime{0};
     
@@ -39,6 +44,8 @@ int main()
 
         runningTime += deltaTime;
 
+        DrawTextureRec(obstacle, obstacleRectangle, obstaclePosition, WHITE);
+
         // Update animation frame
         if(runningTime >= updateTime){
             runningTime = 0;
@@ -49,34 +56,37 @@ int main()
                 heroAnimationFrame = 0;
             }
         }
-        
 
-        DrawTextureRec(hero, heroRectangle, heroPosition, WHITE );
+        DrawTextureRec(hero, heroRectangle, heroPosition, WHITE);
 
         if (heroPosition.y >= windowHeight - heroRectangle.height)
         {
             // Rectangle on the ground
             isInAir = false;
 
-            velocity = 0;
+            heroVelocity = 0;
         }
         else
         {
             // Rectangle in the air
             isInAir = true;
 
-            velocity += gravity * deltaTime;
+            heroVelocity += gravity * deltaTime;
         }
 
         if (IsKeyPressed(KEY_SPACE) && !isInAir)
         {
-            velocity -= jumpVelocity;
+            heroVelocity -= jumpVelocity;
         }
 
-        heroPosition.y += velocity * deltaTime;
+        // Update obstacle position
+        obstaclePosition.x += obstacleVelocity * deltaTime;
+        // Update hero position
+        heroPosition.y += heroVelocity * deltaTime;
 
         EndDrawing();
     }
     UnloadTexture(hero);
+    UnloadTexture(obstacle);
     CloseWindow();
 }
