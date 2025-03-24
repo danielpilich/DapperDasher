@@ -8,7 +8,7 @@ int main()
 
     InitWindow(windowWidth, windowHeight, "Dapper Dasher");
 
-    const int gravity{1};
+    const int gravity{2'000}; // (pixels / second) / second
 
     Texture2D hero = LoadTexture("textures/hero.png");
     Rectangle heroRectangle;
@@ -23,7 +23,7 @@ int main()
     int velocity{0};
     bool isInAir{false};
 
-    const int jumpVelocity{22};
+    const int jumpVelocity{1'000}; // pixels / second
 
     SetTargetFPS(60);
 
@@ -31,6 +31,8 @@ int main()
     {
         BeginDrawing();
         ClearBackground(WHITE);
+
+        const float deltaTime{ GetFrameTime() };
 
         DrawTextureRec(hero, heroRectangle, heroPosition, WHITE );
 
@@ -46,7 +48,7 @@ int main()
             // Rectangle in the air
             isInAir = true;
 
-            velocity += gravity;
+            velocity += gravity * deltaTime;
         }
 
         if (IsKeyPressed(KEY_SPACE) && !isInAir)
@@ -54,7 +56,7 @@ int main()
             velocity -= jumpVelocity;
         }
 
-        heroPosition.y += velocity;
+        heroPosition.y += velocity * deltaTime;
 
         EndDrawing();
     }
