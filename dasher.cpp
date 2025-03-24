@@ -42,20 +42,26 @@ int main()
 
         const float deltaTime{ GetFrameTime() };
 
-        runningTime += deltaTime;
 
         DrawTextureRec(obstacle, obstacleRectangle, obstaclePosition, WHITE);
 
-        // Update animation frame
-        if(runningTime >= updateTime){
-            runningTime = 0;
-
-            heroRectangle.x = heroAnimationFrame * heroRectangle.width;
-            heroAnimationFrame++;
-            if(heroAnimationFrame > 5){
-                heroAnimationFrame = 0;
+        if(!isInAir){
+            runningTime += deltaTime;            
+            if(runningTime >= updateTime){
+                runningTime = 0;
+    
+                // Update animation frame  
+                heroRectangle.x = heroAnimationFrame * heroRectangle.width;
+                heroAnimationFrame++;
+                if(heroAnimationFrame > 5){
+                    heroAnimationFrame = 0;
+                }
             }
         }
+        else{
+            heroRectangle.x = 0 * heroRectangle.width;
+        }
+        
 
         DrawTextureRec(hero, heroRectangle, heroPosition, WHITE);
 
