@@ -25,23 +25,19 @@ int main()
     Texture2D obstacle = LoadTexture("textures/obstacle.png");
     int obstacleVelocity{-200};
 
-    AnimationData obstaclesData[2]{
-        // Obstacle 1
-        {
-            {0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8},            // Rectangle rectangle
-            {windowDimensions[0], windowDimensions[1] - obstacle.height / 8}, // Vector2 position
-            0,                                                                // int frame
-            1.0f / 12.0f,                                                     // float updateTime
-            0.0f                                                              // float runningTime
-        },
-        // Obstacle 2
-        {
-            {0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8},                  // Rectangle rectangle
-            {windowDimensions[0] + 300, windowDimensions[1] - obstacle.height / 8}, // Vector2 position
-            0,                                                                      // int frame
-            1.0f / 16.0f,                                                           // float updateTime
-            0.0f                                                                    // float runningTime
-        }};
+    AnimationData obstaclesData[2]{};
+    for(int i = 0; i < 2; i++){
+        obstaclesData[i].rectangle.x = 0.0;
+        obstaclesData[i].rectangle.y = 0.0;
+        obstaclesData[i].rectangle.width = obstacle.width / 8;
+        obstaclesData[i].rectangle.height = obstacle.height / 8;
+        obstaclesData[i].position.y = windowDimensions[1] - obstacle.height / 8;
+        obstaclesData[i].frame = 0.0;
+        obstaclesData[i].runningTime = 0.0;
+        obstaclesData[i].updateTime = 1.0f / 12.0f;
+    }
+    obstaclesData[0].position.x = windowDimensions[0];
+    obstaclesData[1].position.x = windowDimensions[0] + 300;
 
     // Hero parameters
     Texture2D hero = LoadTexture("textures/hero.png");
