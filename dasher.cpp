@@ -1,5 +1,14 @@
 #include "raylib.h";
 
+struct AnimationData
+{
+    Rectangle rectangle;
+    Vector2 position;
+    int frame;
+    float updateTime;
+    float runningTime;
+};
+
 int main()
 {
     // Window dimensions
@@ -12,36 +21,39 @@ int main()
 
     // Obstacle parameters
     Texture2D obstacle = LoadTexture("textures/obstacle.png");
-    Rectangle obstacleRectangle{0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8};
-    Vector2 obstaclePosition{windowWidth, windowHeight - obstacleRectangle.height};
     int obstacleVelocity{-200};
-    int obstacleAnimationFrame{0};
-    int obstacleAnimationLoop{1};
-    float obstacleRunningTime{0};
-    const float obstacleUpdateTime{1.0f / 12.0f};
 
-    
-    Rectangle obstacle2Rectangle{0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8};
-    Vector2 obstacle2Position{windowWidth + 300, windowHeight - obstacleRectangle.height};
-    int obstacle2AnimationFrame{0};
+    AnimationData obstacleData{
+        {0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8}, // Rectangle rectangle
+        {windowWidth, windowHeight - obstacle.height / 8},     // Vector2 position
+        0,                                                     // int frame
+        1.0f / 12.0f,                                          // float updateTime
+        0.0f                                                   // float runningTime
+    };
+    int obstacleAnimationLoop{1};
+
+    AnimationData obstacle2Data{
+        {0.0f, 0.0f, obstacle.width / 8, obstacle.height / 8},   // Rectangle rectangle
+        {windowWidth + 300, windowHeight - obstacle.height / 8}, // Vector2 position
+        0,                                                       // int frame
+        1.0f / 16.0f,                                            // float updateTime
+        0.0f                                                     // float runningTime
+    };
     int obstacle2AnimationLoop{1};
-    float obstacle2RunningTime{0};
-    const float obstacle2UpdateTime{1.0f / 16.0f};
 
     // Hero parameters
     Texture2D hero = LoadTexture("textures/hero.png");
-    Rectangle heroRectangle;
-    heroRectangle.width = hero.width / 6;
-    heroRectangle.height = hero.height;
-    heroRectangle.x = 0;
-    heroRectangle.y = 0;
-    Vector2 heroPosition;
-    heroPosition.x = windowWidth / 2 - heroRectangle.width / 2;
-    heroPosition.y = windowHeight - heroRectangle.height;
+    AnimationData heroData;
+    heroData.rectangle.width = hero.width / 6;
+    heroData.rectangle.height = hero.height;
+    heroData.rectangle.x = 0;
+    heroData.rectangle.y = 0;
+    heroData.position.x = windowWidth / 2 - heroData.rectangle.width / 2;
+    heroData.position.y = windowHeight - heroData.rectangle.height;
+    heroData.frame = 0;
+    heroData.updateTime = 1.0f / 12.0f;
+    heroData.runningTime = 0.0f;
     int heroVelocity{0};
-    int heroAnimationFrame{0};
-    float heroRunningTime{0};
-    const float heroUpdateTime{1.0f / 12.0f};
 
     bool isInAir{false};
 
@@ -56,65 +68,65 @@ int main()
 
         const float deltaTime{GetFrameTime()};
 
-        //Obstacle animation
-        obstacleRunningTime += deltaTime;
-        if (obstacleRunningTime >= obstacleUpdateTime)
+        // Obstacle animation
+        obstacleData.runningTime += deltaTime;
+        if (obstacleData.runningTime >= obstacleData.updateTime)
         {
-            obstacleRunningTime = 0;
+            obstacleData.runningTime = 0;
 
             // Update animation frame
-            obstacleRectangle.x = obstacleAnimationFrame * obstacleRectangle.width;
-            obstacleAnimationFrame += obstacleAnimationLoop;
-            if (obstacleAnimationFrame >= 7 || obstacleAnimationFrame <= 0)
+            obstacleData.rectangle.x = obstacleData.frame * obstacleData.rectangle.width;
+            obstacleData.frame += obstacleAnimationLoop;
+            if (obstacleData.frame >= 7 || obstacleData.frame <= 0)
             {
                 obstacleAnimationLoop *= -1;
             }
         }
 
-        //Obstacle 2 animation
-        obstacle2RunningTime += deltaTime;
-        if (obstacle2RunningTime >= obstacle2UpdateTime)
+        // Obstacle 2 animation
+        obstacle2Data.runningTime += deltaTime;
+        if (obstacle2Data.runningTime >= obstacle2Data.updateTime)
         {
-            obstacle2RunningTime = 0;
+            obstacle2Data.runningTime = 0;
 
             // Update animation frame
-            obstacle2Rectangle.x = obstacle2AnimationFrame * obstacle2Rectangle.width;
-            obstacle2AnimationFrame += obstacle2AnimationLoop;
-            if (obstacle2AnimationFrame >= 7 || obstacle2AnimationFrame <= 0)
+            obstacle2Data.rectangle.x = obstacle2Data.frame * obstacle2Data.rectangle.width;
+            obstacle2Data.frame += obstacle2AnimationLoop;
+            if (obstacle2Data.frame >= 7 || obstacle2Data.frame <= 0)
             {
                 obstacle2AnimationLoop *= -1;
             }
         }
 
-        DrawTextureRec(obstacle, obstacleRectangle, obstaclePosition, WHITE);        
-        DrawTextureRec(obstacle, obstacle2Rectangle, obstacle2Position, RED);
+        DrawTextureRec(obstacle, obstacleData.rectangle, obstacleData.position, WHITE);
+        DrawTextureRec(obstacle, obstacle2Data.rectangle, obstacle2Data.position, RED);
 
         // Hero animation
         if (!isInAir)
         {
-            heroRunningTime += deltaTime;
-            if (heroRunningTime >= heroUpdateTime)
+            heroData.runningTime += deltaTime;
+            if (heroData.runningTime >= heroData.updateTime)
             {
-                heroRunningTime = 0;
+                heroData.runningTime = 0;
 
                 // Update animation frame
-                heroRectangle.x = heroAnimationFrame * heroRectangle.width;
-                heroAnimationFrame++;
-                if (heroAnimationFrame > 5)
+                heroData.rectangle.x = heroData.frame * heroData.rectangle.width;
+                heroData.frame++;
+                if (heroData.frame > 5)
                 {
-                    heroAnimationFrame = 0;
+                    heroData.frame = 0;
                 }
             }
         }
         else
         {
-            heroRectangle.x = 0 * heroRectangle.width;
+            heroData.rectangle.x = 0 * heroData.rectangle.width;
         }
 
-        DrawTextureRec(hero, heroRectangle, heroPosition, WHITE);
+        DrawTextureRec(hero, heroData.rectangle, heroData.position, WHITE);
 
         // Hero movement
-        if (heroPosition.y >= windowHeight - heroRectangle.height)
+        if (heroData.position.y >= windowHeight - heroData.rectangle.height)
         {
             // Rectangle on the ground
             isInAir = false;
@@ -135,12 +147,12 @@ int main()
         }
 
         // Update obstacle position
-        obstaclePosition.x += obstacleVelocity * deltaTime;        
+        obstacleData.position.x += obstacleVelocity * deltaTime;
         // Update obstacle 2 position
-        obstacle2Position.x += obstacleVelocity * deltaTime;
+        obstacle2Data.position.x += obstacleVelocity * deltaTime;
 
         // Update hero position
-        heroPosition.y += heroVelocity * deltaTime;
+        heroData.position.y += heroVelocity * deltaTime;
 
         EndDrawing();
     }
