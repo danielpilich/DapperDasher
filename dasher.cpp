@@ -7,8 +7,30 @@ struct AnimationData
     int frame;
     float updateTime;
     float runningTime;
-    int loop = 1;
 };
+
+bool isOnGround(AnimationData data, int windowsHeight)
+{
+    return data.position.y >= windowsHeight - data.rectangle.height;
+}
+
+AnimationData updateAnimationData(AnimationData data, float deltaTime, int maxFrame)
+{
+    data.runningTime += deltaTime;
+    if (data.runningTime >= data.updateTime)
+    {
+        data.runningTime = 0.0f;
+
+        // Update animation frame
+        data.rectangle.x = data.frame * data.rectangle.width;
+        data.frame++;
+        if (data.frame > maxFrame)
+        {
+            data.frame = 0;
+        }
+    }
+    return data;
+}
 
 int main()
 {
@@ -23,6 +45,7 @@ int main()
 
     // Obstacle parameters
     Texture2D obstacle = LoadTexture("textures/obstacle.png");
+    const int obstacleMaxFrame{7};
     int obstacleVelocity{-200};
 
     const int sizeOfObstacles{10};
@@ -36,12 +59,13 @@ int main()
         obstaclesData[i].position.x = windowDimensions[0] + 300 * i;
         obstaclesData[i].position.y = windowDimensions[1] - obstacle.height / 8;
         obstaclesData[i].frame = 0.0;
+        obstaclesData[i].updateTime = 1.0f / 16.0f;
         obstaclesData[i].runningTime = 0.0;
-        obstaclesData[i].updateTime = 1.0f / 12.0f;
     }
 
     // Hero parameters
     Texture2D hero = LoadTexture("textures/hero.png");
+    const int heroMaxFrame{5};
     AnimationData heroData;
     heroData.rectangle.width = hero.width / 6;
     heroData.rectangle.height = hero.height;
@@ -69,21 +93,8 @@ int main()
 
         for (int i = 0; i < sizeOfObstacles; i++)
         {
-            // Obstacle animation
-            obstaclesData[i].runningTime += deltaTime;
-            if (obstaclesData[i].runningTime >= obstaclesData[i].updateTime)
-            {
-                obstaclesData[i].runningTime = 0;
+            obstaclesData[i] = updateAnimationData(obstaclesData[i], deltaTime, obstacleMaxFrame);
 
-                // Update animation frame
-                obstaclesData[i].rectangle.x = obstaclesData[i].frame * obstaclesData[i].rectangle.width;
-                obstaclesData[i].frame += obstaclesData[i].loop;
-                if (obstaclesData[i].frame >= 7 || obstaclesData[i].frame <= 0)
-                {
-                    obstaclesData[i].loop *= -1;
-                }
-            }
-            
             // Draw obstacle
             DrawTextureRec(obstacle, obstaclesData[i].rectangle, obstaclesData[i].position, WHITE);
 
@@ -94,19 +105,7 @@ int main()
         // Hero animation
         if (!isInAir)
         {
-            heroData.runningTime += deltaTime;
-            if (heroData.runningTime >= heroData.updateTime)
-            {
-                heroData.runningTime = 0;
-
-                // Update animation frame
-                heroData.rectangle.x = heroData.frame * heroData.rectangle.width;
-                heroData.frame++;
-                if (heroData.frame > 5)
-                {
-                    heroData.frame = 0;
-                }
-            }
+            heroData = updateAnimationData(heroData, deltaTime, heroMaxFrame);
         }
         else
         {
@@ -116,7 +115,7 @@ int main()
         DrawTextureRec(hero, heroData.rectangle, heroData.position, WHITE);
 
         // Hero movement
-        if (heroData.position.y >= windowDimensions[1] - heroData.rectangle.height)
+        if (isOnGround(heroData, windowDimensions[1]))
         {
             // Rectangle on the ground
             isInAir = false;
@@ -143,5 +142,6 @@ int main()
     }
     UnloadTexture(hero);
     UnloadTexture(obstacle);
+    
     CloseWindow();
 }
