@@ -82,14 +82,28 @@ int main()
 
     const int jumpVelocity{1'000}; // pixels / second
 
+    Texture2D background = LoadTexture("textures/background2.png");
+    float backgroundX{};
+
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
+        const float deltaTime{GetFrameTime()};
+
         BeginDrawing();
         ClearBackground(WHITE);
 
-        const float deltaTime{GetFrameTime()};
+        backgroundX -= 20 * deltaTime;
+        if(backgroundX <= -background.width*2){
+            backgroundX = 0.0;
+        }
+
+        // Draw the background
+        Vector2 background1Position{backgroundX, 0.0};
+        DrawTextureEx(background, background1Position, 0.0, 2.0, WHITE);
+        Vector2 background2Position{backgroundX + background.width*2, 0.0};
+        DrawTextureEx(background, background2Position, 0.0, 2.0, WHITE);
 
         for (int i = 0; i < sizeOfObstacles; i++)
         {
@@ -142,6 +156,7 @@ int main()
     }
     UnloadTexture(hero);
     UnloadTexture(obstacle);
-    
+    UnloadTexture(background);
+
     CloseWindow();
 }
