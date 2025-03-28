@@ -82,11 +82,14 @@ int main()
 
     const int jumpVelocity{1'000}; // pixels / second
 
-    Texture2D background = LoadTexture("textures/background2.png");
+    Texture2D background = LoadTexture("textures/background.png");
+    Texture2D midground = LoadTexture("textures/midground.png");
+    Texture2D foreground = LoadTexture("textures/foreground.png");
     float backgroundX{};
+    float midgroundX{};
+    float foregroundX{};
 
     SetTargetFPS(60);
-
     while (!WindowShouldClose())
     {
         const float deltaTime{GetFrameTime()};
@@ -94,25 +97,48 @@ int main()
         BeginDrawing();
         ClearBackground(WHITE);
 
+        // Scroll the background textures
         backgroundX -= 20 * deltaTime;
-        if(backgroundX <= -background.width*2){
+        if (backgroundX <= -background.width * 2)
+        {
             backgroundX = 0.0;
+        }
+
+        midgroundX -= 40 * deltaTime;
+        if (midgroundX <= -midground.width * 2)
+        {
+            midgroundX = 0.0;
+        }
+
+        foregroundX -= 80 * deltaTime;
+        if (foregroundX <= -foreground.width * 2)
+        {
+            foregroundX = 0.0;
         }
 
         // Draw the background
         Vector2 background1Position{backgroundX, 0.0};
         DrawTextureEx(background, background1Position, 0.0, 2.0, WHITE);
-        Vector2 background2Position{backgroundX + background.width*2, 0.0};
+        Vector2 background2Position{backgroundX + background.width * 2, 0.0};
         DrawTextureEx(background, background2Position, 0.0, 2.0, WHITE);
 
+        Vector2 midground1Position{midgroundX, 0.0};
+        DrawTextureEx(midground, midground1Position, 0.0, 2.0, WHITE);
+        Vector2 midground2Position{midgroundX + midground.width * 2, 0.0};
+        DrawTextureEx(midground, midground2Position, 0.0, 2.0, WHITE);
+
+        Vector2 foreground1Position{foregroundX, 0.0};
+        DrawTextureEx(foreground, foreground1Position, 0.0, 2.0, WHITE);
+        Vector2 foreground2Position{foregroundX + foreground.width * 2, 0.0};
+        DrawTextureEx(foreground, foreground2Position, 0.0, 2.0, WHITE);
+
+        // Obstacles animations
         for (int i = 0; i < sizeOfObstacles; i++)
         {
             obstaclesData[i] = updateAnimationData(obstaclesData[i], deltaTime, obstacleMaxFrame);
 
-            // Draw obstacle
             DrawTextureRec(obstacle, obstaclesData[i].rectangle, obstaclesData[i].position, WHITE);
 
-            // Update obstacles position
             obstaclesData[i].position.x += obstacleVelocity * deltaTime;
         }
 
@@ -157,6 +183,8 @@ int main()
     UnloadTexture(hero);
     UnloadTexture(obstacle);
     UnloadTexture(background);
+    UnloadTexture(midground);
+    UnloadTexture(foreground);
 
     CloseWindow();
 }
