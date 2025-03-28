@@ -78,6 +78,7 @@ int main()
     heroData.runningTime = 0.0f;
     int heroVelocity{0};
 
+    bool collision{};
     bool isInAir{false};
 
     const int jumpVelocity{1'000}; // pixels / second
@@ -137,9 +138,27 @@ int main()
         {
             obstaclesData[i] = updateAnimationData(obstaclesData[i], deltaTime, obstacleMaxFrame);
 
-            DrawTextureRec(obstacle, obstaclesData[i].rectangle, obstaclesData[i].position, WHITE);
-
             obstaclesData[i].position.x += obstacleVelocity * deltaTime;
+        }
+
+        for (AnimationData obstacleData : obstaclesData)
+        {
+            float padding{50.0f};
+            Rectangle obstacleRectangle{
+                obstacleData.position.x + padding,
+                obstacleData.position.y + padding,
+                obstacleData.rectangle.width - 2 * padding,
+                obstacleData.rectangle.height - 2 * padding};
+            Rectangle heroRectangle{
+                heroData.position.x,
+                heroData.position.y,
+                heroData.rectangle.width,
+                heroData.rectangle.height
+            };
+
+            if(CheckCollisionRecs(obstacleRectangle, heroRectangle)){
+                collision = true;
+            }
         }
 
         // Hero animation
@@ -152,7 +171,19 @@ int main()
             heroData.rectangle.x = 0 * heroData.rectangle.width;
         }
 
-        DrawTextureRec(hero, heroData.rectangle, heroData.position, WHITE);
+        // Draw textures
+        if(!collision){
+            // Win State
+            DrawTextureRec(hero, heroData.rectangle, heroData.position, WHITE);
+
+            for (int i = 0; i < sizeOfObstacles; i++)
+            {            
+                DrawTextureRec(obstacle, obstaclesData[i].rectangle, obstaclesData[i].position, WHITE);
+            }
+        }
+        else{
+            // Lose State
+        }
 
         // Hero movement
         if (isOnGround(heroData, windowDimensions[1]))
