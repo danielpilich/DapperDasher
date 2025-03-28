@@ -48,7 +48,7 @@ int main()
     const int obstacleMaxFrame{7};
     int obstacleVelocity{-200};
 
-    const int sizeOfObstacles{10};
+    const int sizeOfObstacles{2};
     AnimationData obstaclesData[sizeOfObstacles]{};
     for (int i = 0; i < sizeOfObstacles; i++)
     {
@@ -78,6 +78,7 @@ int main()
     heroData.runningTime = 0.0f;
     int heroVelocity{0};
 
+    float finishLine{obstaclesData[sizeOfObstacles - 1].position.x};
     bool collision{};
     bool isInAir{false};
 
@@ -171,18 +172,21 @@ int main()
             heroData.rectangle.x = 0 * heroData.rectangle.width;
         }
 
-        // Draw textures
-        if(!collision){
-            // Win State
+        // Game state
+        if(collision){
+            DrawText("Game Over!", windowDimensions[0]/2 - 160, windowDimensions[1]/2 - 32, 64, RED);
+        }
+        else if (heroData.position.x >= finishLine)
+        {         
+            DrawText("You Win!", windowDimensions[0]/2 - 128, windowDimensions[1]/2 - 32, 64, GREEN);
+        }        
+        else{
             DrawTextureRec(hero, heroData.rectangle, heroData.position, WHITE);
 
             for (int i = 0; i < sizeOfObstacles; i++)
             {            
                 DrawTextureRec(obstacle, obstaclesData[i].rectangle, obstaclesData[i].position, WHITE);
-            }
-        }
-        else{
-            // Lose State
+            }       
         }
 
         // Hero movement
@@ -208,6 +212,8 @@ int main()
 
         // Update hero position
         heroData.position.y += heroVelocity * deltaTime;
+
+        finishLine += obstacleVelocity * deltaTime;
 
         EndDrawing();
     }
